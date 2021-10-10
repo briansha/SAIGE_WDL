@@ -369,7 +369,7 @@ task combine_saige_results {
 
         String docker
         Float memory = 3.5
-	    Int? disk_size_override
+	Int? disk_size_override
         Int cpu = 1
         Int preemptible = 1
     	Int maxRetries = 0
