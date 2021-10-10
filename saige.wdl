@@ -35,15 +35,15 @@ workflow run_saige {
     }
 
     scatter (file in data_step2) {
-	    call saige_step2_SPAtests {
-	      input:
-            vcfFile = file[0],
-            vcfFileIndex = file[1],
-            chrom = file[2],
-            GMMATmodelFile = saige_step1_fitNULL.GMMATmodelFile,
-            varianceRatioFile = saige_step1_fitNULL.varianceRatioFile,
-            docker = saige_docker
-	    }
+      call saige_step2_SPAtests {
+        input:
+          vcfFile = file[0],
+          vcfFileIndex = file[1],
+          chrom = file[2],
+          GMMATmodelFile = saige_step1_fitNULL.GMMATmodelFile,
+          varianceRatioFile = saige_step1_fitNULL.varianceRatioFile,
+          docker = saige_docker
+      }
     }
 
     call combine_saige_results {
@@ -62,12 +62,12 @@ workflow run_saige {
         File merged_saige_file = combine_saige_results.merged_saige_file
         Array[File] output_plots = Plots.output_plots
         Array[File] output_saige = Plots.output_saige
-	}
+    }
 
     meta {
-	     author : "Brian Sharber"
-	     email : "brian.sharber@vumc.org"
-	     description : "Run SAIGE"
+        author : "Brian Sharber"
+        email : "brian.sharber@vumc.org"
+        description : "Run SAIGE"
     }
 }
 
@@ -188,18 +188,18 @@ task saige_step1_fitNULL {
 	>>>
 
     runtime {
-		  docker: docker
-		  memory: memory + " GiB"
-		  disks: "local-disk " + disk + " HDD"
+	  docker: docker
+          memory: memory + " GiB"
+	  disks: "local-disk " + disk + " HDD"
           cpu: cpu
-		  preemptible: preemptible
+	  preemptible: preemptible
           maxRetries: maxRetries
 	}
 
     output {
-	    File GMMATmodelFile = "saige_step1_" + phenoCol + ".rda"
-        File varianceRatioFile = "saige_step1_" + phenoCol + ".varianceRatio.txt"
-        Array[File] other_files = glob("*.txt")
+	  File GMMATmodelFile = "saige_step1_" + phenoCol + ".rda"
+          File varianceRatioFile = "saige_step1_" + phenoCol + ".varianceRatio.txt"
+          Array[File] other_files = glob("*.txt")
     }
 }
 
@@ -275,8 +275,8 @@ task saige_step2_SPAtests {
 
         # Runtime
         String docker
-	    Float memory = 4.0
-	    Int? disk_size_override
+	Float memory = 4.0
+	Int? disk_size_override
         Int cpu = 1
         Int preemptible = 1
         Int maxRetries = 0
@@ -284,7 +284,7 @@ task saige_step2_SPAtests {
     Float vcf_size = size(vcfFile, "GiB")
     Int disk = select_first([disk_size_override, ceil(10.0 + 2.0 * vcf_size)])
 
-	command <<<
+    command <<<
       set -euo pipefail
       step2_SPAtests.R \
         ~{if defined(vcfFile) then "--vcfFile=~{vcfFile} " else " "} \
@@ -348,18 +348,18 @@ task saige_step2_SPAtests {
         gzip ~{chrom}.txt
 	>>>
 
-	runtime {
-		docker: docker
-		memory: memory + " GiB"
-		disks: "local-disk " + disk + " HDD"
+    runtime {
+	docker: docker
+	memory: memory + " GiB"
+	disks: "local-disk " + disk + " HDD"
         cpu: cpu
-		preemptible: preemptible
+	preemptible: preemptible
         maxRetries: maxRetries
-	}
+    }
 
-	output {
-		File saige_output_file = chrom + ".txt.gz"
-	}
+    output {
+	File saige_output_file = chrom + ".txt.gz"
+    }
 }
 
 task combine_saige_results {
@@ -382,11 +382,11 @@ task combine_saige_results {
     >>>
 
     runtime {
-		  docker: docker
-		  memory: memory + " GiB"
-		  disks: "local-disk " + disk + " HDD"
+	  docker: docker
+          memory: memory + " GiB"
+	  disks: "local-disk " + disk + " HDD"
           cpu: cpu
-		  preemptible: preemptible
+	  preemptible: preemptible
           maxRetries: maxRetries
 	}
 
@@ -450,7 +450,7 @@ task Plots {
   runtime {
         docker: docker
         memory: memory + " GiB"
-		disks: "local-disk " + disk + " HDD"
+	disks: "local-disk " + disk + " HDD"
         cpu: cpu
         preemptible: preemptible
         maxRetries: maxRetries
